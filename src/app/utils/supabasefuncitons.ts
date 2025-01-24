@@ -23,7 +23,9 @@ export const addMessage = async(name:string,text:string )=>{
 
 export const deleteMessage = async (id: number) => {
     const { error } = await supabase.from("board").delete().eq("id", id);
-    if (error) return null;
+    console.log(error);
+    //if (error) return null;
+    return error;
   }
 
 export const editMessage = async (id:number,name:string,text:string) =>{
