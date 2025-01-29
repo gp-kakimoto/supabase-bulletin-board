@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { Message } from "../utils/interfaces";
 import { addMessage, editMessage } from "../utils/supabasefuncitons";
 import { useState } from "react";
+import Input from "./Input";
 
 type Props = {
   message: Message | null;
@@ -45,14 +46,6 @@ const Form = (props: Props) => {
     }
   };
 
-  const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value);
-  };
-
-  const handleText = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setText(e.target.value);
-  };
-
   return (
     <div>
       <form
@@ -61,40 +54,20 @@ const Form = (props: Props) => {
       >
         <div className="flex mx-auto justify-center">
           <div className="w-[420px]">
-            <div className="flex justify-center bg-red-300">
-              <label
-                htmlFor="name"
-                className="my-auto mx-auto text-right w-[80px]"
-              >
-                名前
-              </label>
-
-              <input
-                id="name"
-                name="name"
-                type="text"
-                value={name}
-                onChange={handleName}
-                className="m-2 mx-auto shadow-lg p-1 outline-none w-[300px] text-black"
-              />
-            </div>
-
-            <div className="flex justify-center bg-red-400">
-              <label
-                htmlFor="message"
-                className="my-auto mx-auto text-right w-[80px]"
-              >
-                メッセージ
-              </label>
-              <input
-                id="message"
-                name="message"
-                type="textarea"
-                value={text}
-                onChange={handleText}
-                className="m-2 mx-auto shadow-lg p-1 outline-none w-[300px] text-black"
-              />
-            </div>
+            <Input
+              data={name ? name : null}
+              isEditing={isEditing}
+              isName={true}
+              setName={setName}
+              setText={setText}
+            />
+            <Input
+              data={text ? text : null}
+              isEditing={isEditing}
+              isName={false}
+              setName={setName}
+              setText={setText}
+            />
           </div>
           <button className="shadow-md border-2 px-1 py-1 rounded-lg bg-blue-200 max-w-[80px]">
             {isEditing ? "編集" : "追加"}
