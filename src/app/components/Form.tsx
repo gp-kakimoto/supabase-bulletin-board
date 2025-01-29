@@ -15,27 +15,32 @@ const Form = (props: Props) => {
 
   const [name, setName] = useState(isEditing ? message?.name : "");
   const [text, setText] = useState(isEditing ? message?.text : "");
-
+  const [error, setError] = useState<boolean>(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!isEditing) {
-      if (name && text) {
-        const tmpMessages = await addMessage(name, text);
-        if (tmpMessages) {
-          setName("");
-          setText("");
-          router.refresh();
-        }
+
+    if (!isEditing && name && text) {
+      const tmpMessages = await addMessage(name, text);
+      if (tmpMessages) {
+        setName("");
+        setText("");
+        setError(false);
+        router.refresh();
+      } else {
+        setError(true);
       }
-    } else {
-      if (message?.id && name && text) {
-        const tmpMessages = await editMessage(message.id, name, text);
-        if (tmpMessages) {
-          router.refresh();
-          setIsEditing(false);
-        }
+    }
+
+    if (isEditing && message?.id && name && text) {
+      const tmpMessages = await editMessage(message.id, name, text);
+      if (tmpMessages) {
+        router.refresh();
+        setError(false);
+        setIsEditing(false);
+      } else {
+        setError(true);
       }
     }
   };
@@ -49,52 +54,55 @@ const Form = (props: Props) => {
   };
 
   return (
-    <form
-      className="flex w-[500px] mx-auto  p-0"
-      onSubmit={(e) => handleSubmit(e)}
-    >
-      <div className="flex mx-auto justify-center">
-        <div className="w-[420px]">
-          <div className="flex justify-center bg-red-300">
-            <label
-              htmlFor="name"
-              className="my-auto mx-auto text-right w-[80px]"
-            >
-              名前
-            </label>
+    <div>
+      <form
+        className="flex w-[500px] mx-auto  p-0"
+        onSubmit={(e) => handleSubmit(e)}
+      >
+        <div className="flex mx-auto justify-center">
+          <div className="w-[420px]">
+            <div className="flex justify-center bg-red-300">
+              <label
+                htmlFor="name"
+                className="my-auto mx-auto text-right w-[80px]"
+              >
+                名前
+              </label>
 
-            <input
-              id="name"
-              name="name"
-              type="text"
-              value={name}
-              onChange={handleName}
-              className="m-2 mx-auto shadow-lg p-1 outline-none w-[300px] text-black"
-            />
-          </div>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                value={name}
+                onChange={handleName}
+                className="m-2 mx-auto shadow-lg p-1 outline-none w-[300px] text-black"
+              />
+            </div>
 
-          <div className="flex justify-center bg-red-400">
-            <label
-              htmlFor="message"
-              className="my-auto mx-auto text-right w-[80px]"
-            >
-              メッセージ
-            </label>
-            <input
-              id="message"
-              name="message"
-              type="textarea"
-              value={text}
-              onChange={handleText}
-              className="m-2 mx-auto shadow-lg p-1 outline-none w-[300px] text-black"
-            />
+            <div className="flex justify-center bg-red-400">
+              <label
+                htmlFor="message"
+                className="my-auto mx-auto text-right w-[80px]"
+              >
+                メッセージ
+              </label>
+              <input
+                id="message"
+                name="message"
+                type="textarea"
+                value={text}
+                onChange={handleText}
+                className="m-2 mx-auto shadow-lg p-1 outline-none w-[300px] text-black"
+              />
+            </div>
           </div>
+          <button className="shadow-md border-2 px-1 py-1 rounded-lg bg-blue-200 max-w-[80px]">
+            {isEditing ? "編集" : "追加"}
+          </button>
         </div>
-        <button className="shadow-md border-2 px-1 py-1 rounded-lg bg-blue-200 max-w-[80px]">
-          {isEditing ? "編集" : "追加"}
-        </button>
-      </div>
-    </form>
+      </form>
+      {error ? <h2 className="text-red-500 text-center">Error</h2> : ""}
+    </div>
   );
 };
 export default Form;

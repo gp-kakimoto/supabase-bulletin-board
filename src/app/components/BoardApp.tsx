@@ -18,26 +18,31 @@ const BoardApp = (props: Props) => {
     <div className="flex justify-center font-[family-name:var(--font-geist-sans)] w-50">
       <main className="w-[500]px ml-auto mr-auto">
         <h1 className="ml-auto text-center mr-auto">一言掲示板</h1>
-        {!isEditing ? (
-          <div>
-            <Form
-              message={null}
-              isEditing={false}
-              setIsEditing={setIsEditing}
-            />
 
-            <Lists
-              messages={messages}
+        {messages ? (
+          !isEditing ? (
+            <div>
+              <Form
+                message={null}
+                isEditing={false}
+                setIsEditing={setIsEditing}
+              />
+
+              <Lists
+                messages={messages}
+                setIsEditing={setIsEditing}
+                setEditingMessage={setEditingMessage}
+              />
+            </div>
+          ) : (
+            <EdtingForm
+              message={editingMessage}
+              isEditing={isEditing}
               setIsEditing={setIsEditing}
-              setEditingMessage={setEditingMessage}
             />
-          </div>
+          )
         ) : (
-          <EdtingForm
-            message={editingMessage}
-            isEditing={isEditing}
-            setIsEditing={setIsEditing}
-          />
+          <h2>network error</h2>
         )}
       </main>
 
