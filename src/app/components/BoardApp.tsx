@@ -1,10 +1,9 @@
 "use client";
 import { Message } from "../utils/interfaces";
-
 import { useState } from "react";
-import EdtingForm from "./EdtingForm";
 import Form from "./Form";
 import Lists from "./Lists";
+
 type Props = {
   messages: Message[] | null;
 };
@@ -15,9 +14,9 @@ const BoardApp = (props: Props) => {
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
 
   return (
-    <div className="flex justify-center font-[family-name:var(--font-geist-sans)] w-50">
-      <main className="w-[500]px ml-auto mr-auto">
-        <h1 className="ml-auto text-center mr-auto">一言掲示板</h1>
+    <div className="font-[family-name:var(--font-geist-sans)]">
+      <main className="max-w-[500px] ml-auto mr-auto mb-2">
+        <h1 className="text-center mb-4 mx-auto max-w-[490px]">一言掲示板</h1>
 
         {messages ? (
           !isEditing ? (
@@ -35,7 +34,7 @@ const BoardApp = (props: Props) => {
               />
             </div>
           ) : (
-            <EdtingForm
+            <Form
               message={editingMessage}
               isEditing={isEditing}
               setIsEditing={setIsEditing}

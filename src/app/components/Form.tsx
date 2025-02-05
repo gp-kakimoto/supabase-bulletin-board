@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { Message } from "../utils/interfaces";
-import { addMessage, editMessage } from "../utils/supabasefuncitons";
+import { addMessage, editMessage, addImage } from "../utils/supabasefuncitons";
 import { useState } from "react";
 import Input from "./Input";
 
@@ -16,34 +16,72 @@ const Form = (props: Props) => {
 
   const [name, setName] = useState(isEditing ? message?.name : "");
   const [text, setText] = useState(isEditing ? message?.text : "");
-  const [error, setError] = useState<boolean>(false);
+  const [hasError, setHasError] = useState<boolean>(false);
+  const [image, setImage] = useState<File | null>(null);
+
   const router = useRouter();
+
+  const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    setImage(files && files.length > 0 ? files[0] : null);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!isEditing && name && text) {
-      const tmpMessages = await addMessage(name, text);
-      if (tmpMessages) {
-        setName("");
-        setText("");
-        setError(false);
-        router.refresh();
+    if (!name || !text) return; //Early return if input is empty.
+
+    const handleMessageUpdate = async (
+      imagePath: string | undefined
+    ): Promise<boolean> => {
+      if (!isEditing) {
+        const imagePath_tmp = imagePath ? imagePath : "";
+        const newMessage = await addMessage(name, text, imagePath_tmp);
+        return !!newMessage;
       } else {
-        setError(true);
+        if (!message?.id) return false;
+        const updatedMessage = await editMessage(message.id, name, text);
+        return !!updatedMessage;
       }
+    };
+
+    const imageUploadSuccess = await addImage(image);
+
+    if (image && imageUploadSuccess) setImage(null);
+    else if (image && !imageUploadSuccess) {
+      setHasError(true);
+      return;
     }
 
-    if (isEditing && message?.id && name && text) {
-      const tmpMessages = await editMessage(message.id, name, text);
-      if (tmpMessages) {
-        router.refresh();
-        setError(false);
-        setIsEditing(false);
-      } else {
-        setError(true);
-      }
+    const success = await handleMessageUpdate(imageUploadSuccess?.path);
+
+    if (!success) {
+      setHasError(true);
+      return;
     }
+
+    if (!isEditing) {
+      setName("");
+      setText("");
+    } else {
+      setIsEditing(false);
+    }
+    //setImage(null);
+    setHasError(false);
+
+    /******************************************************
+     * ファイルが選択された後、表示がリセットされないので、
+     * 以下のコードで対処している
+     *****************************************************/
+    const fileInput = document.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement | null;
+    if (fileInput && fileInput.form) {
+      fileInput.form.reset();
+    }
+    /************ここまで********************************* */
+
+    router.refresh();
   };
 
   return (
@@ -56,25 +94,37 @@ const Form = (props: Props) => {
           <div className="w-[420px]">
             <Input
               data={name ? name : null}
-              isEditing={isEditing}
-              isName={true}
-              setName={setName}
-              setText={setText}
+              label={"名前"}
+              id={"name"}
+              name={"name"}
+              isTextarea={false}
+              setValue={setName}
             />
             <Input
               data={text ? text : null}
-              isEditing={isEditing}
-              isName={false}
-              setName={setName}
-              setText={setText}
+              label={"メッセージ"}
+              id={"message"}
+              name={"message"}
+              isTextarea={true}
+              setValue={setText}
             />
+            {!isEditing ? (
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => onChangeFile(e)}
+                defaultValue={""}
+              />
+            ) : (
+              ""
+            )}
           </div>
           <button className="shadow-md border-2 px-1 py-1 rounded-lg bg-blue-200 max-w-[80px]">
             {isEditing ? "編集" : "追加"}
           </button>
         </div>
       </form>
-      {error ? <h2 className="text-red-500 text-center">Error</h2> : ""}
+      {hasError ? <h2 className="text-red-500 text-center">Error</h2> : ""}
     </div>
   );
 };

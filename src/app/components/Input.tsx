@@ -1,43 +1,45 @@
-"use client";
-
-import { useState } from "react";
-
 type Props = {
   data: string | null;
-  isEditing: boolean;
-  isName: boolean;
-  setName: React.Dispatch<React.SetStateAction<string | undefined>>;
-  setText: React.Dispatch<React.SetStateAction<string | undefined>>;
+  label: string;
+  id: string;
+  name: string;
+  isTextarea: boolean;
+  setValue: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 
 const Input = (props: Props) => {
-  const { data, isEditing, isName, setName, setText } = props;
-  const [tmpData, setTmpData] = useState(isEditing ? data : "");
+  const { data, label, id, name, isTextarea, setValue } = props;
 
-  const handleTmpData = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (isName) {
-      setName(e.target.value);
-      setTmpData(e.target.value);
-    } else {
-      setText(e.target.value);
-      setTmpData(e.target.value);
-    }
+  const handleValue = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setValue(e.target.value);
   };
 
   return (
     <div className="flex justify-center bg-red-300">
-      <label htmlFor="name" className="my-auto mx-auto text-right w-[80px]">
-        {isName ? "名前" : "メッセージ"}
+      <label htmlFor={id} className="my-auto mx-auto text-right w-[80px]">
+        {label}
       </label>
-
-      <input
-        id={isName ? "name" : "message"}
-        name={isName ? "name" : "message"}
-        type={isName ? "text" : "textarea"}
-        value={tmpData ? tmpData : ""}
-        onChange={handleTmpData}
-        className="m-2 mx-auto shadow-lg p-1 outline-none w-[300px] text-black"
-      />
+      {!isTextarea ? (
+        <input
+          id={id}
+          name={name}
+          type={"text"}
+          value={data ? data : ""}
+          onChange={handleValue}
+          className="m-2 mx-auto shadow-lg p-1 outline-none w-[300px] text-black"
+        />
+      ) : (
+        <textarea
+          id={id}
+          name={name}
+          rows={5}
+          value={data ? data : ""}
+          onChange={handleValue}
+          className="m-2 mx-auto shadow-lg p-1 outline-none w-[300px] text-black resize-none"
+        ></textarea>
+      )}
     </div>
   );
 };
