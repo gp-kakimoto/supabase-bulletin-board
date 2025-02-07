@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { Message } from "../utils/interfaces";
 import { addMessage, editMessage, addImage } from "../utils/supabasefuncitons";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Input from "./Input";
 
 type Props = {
@@ -20,6 +20,8 @@ const Form = (props: Props) => {
   const [image, setImage] = useState<File | null>(null);
 
   const router = useRouter();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -66,20 +68,10 @@ const Form = (props: Props) => {
     } else {
       setIsEditing(false);
     }
-    //setImage(null);
     setHasError(false);
-
-    /******************************************************
-     * ファイルが選択された後、表示がリセットされないので、
-     * 以下のコードで対処している
-     *****************************************************/
-    const fileInput = document.querySelector(
-      'input[type="file"]'
-    ) as HTMLInputElement | null;
-    if (fileInput && fileInput.form) {
-      fileInput.form.reset();
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
-    /************ここまで********************************* */
 
     router.refresh();
   };
@@ -114,6 +106,7 @@ const Form = (props: Props) => {
                 accept="image/*"
                 onChange={(e) => onChangeFile(e)}
                 defaultValue={""}
+                ref={fileInputRef}
               />
             ) : (
               ""

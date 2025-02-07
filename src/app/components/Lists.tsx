@@ -6,7 +6,7 @@ import {
   deleteMessage,
   getImageUrl,
 } from "../utils/supabasefuncitons";
-import { Fragment } from "react";
+
 import Image from "next/image";
 
 type Props = {
@@ -19,9 +19,9 @@ const Lists = (props: Props) => {
   const { messages, setIsEditing, setEditingMessage } = props;
   const router = useRouter();
   const handleDelete = async (id: number, image_name: string) => {
-    const imageDeleteSusscess = await deleteImage(image_name);
+    const imageDeleteSuccess = await deleteImage(image_name);
     const tmpError = await deleteMessage(id);
-    if (!!image_name && !imageDeleteSusscess) return;
+    if (!!image_name && !imageDeleteSuccess) return;
     if (!tmpError?.message) router.refresh();
   };
 
@@ -30,19 +30,6 @@ const Lists = (props: Props) => {
       setIsEditing(true);
       setEditingMessage(message);
     }
-  };
-
-  /************************************
-   * 改行を<br/>に置き換えるための処理
-   * Giminiに訊いた
-   **********************************/
-  const renderTextWithBreaks = (text: string) => {
-    return text.split("\n").map((line, index) => (
-      <Fragment key={index}>
-        {line}
-        <br />
-      </Fragment>
-    ));
   };
 
   return (
@@ -57,8 +44,8 @@ const Lists = (props: Props) => {
                       <h3 className="text-white mr-2">名前</h3>
                       <h3 className="text-black">{message.name}</h3>
                     </div>
-                    <div className="text-black w-[350px] mx-2 break-all">
-                      {renderTextWithBreaks(message.text)}
+                    <div className="text-black w-[350px] mx-2 break-all whitespace-pre-wrap">
+                      {message.text}
                     </div>
                   </div>
 
@@ -80,7 +67,7 @@ const Lists = (props: Props) => {
                   </div>
                 </div>
 
-                {!!getImageUrl(message.image_name) ? (
+                {!!getImageUrl(message.image_name) && (
                   <div className="w-[380px] m-h-[300px] px-auto mx-auto flex justify-center justify-items-center">
                     <Image
                       alt={message.image_name}
@@ -90,8 +77,6 @@ const Lists = (props: Props) => {
                       src={getImageUrl(message.image_name)}
                     />
                   </div>
-                ) : (
-                  ""
                 )}
               </li>
             ))

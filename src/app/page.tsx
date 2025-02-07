@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { getAllMessages } from "./utils/supabasefuncitons";
 import { Message } from "./utils/interfaces";
 
