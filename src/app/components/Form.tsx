@@ -100,7 +100,7 @@ const Form = (props: Props) => {
               isTextarea={true}
               setValue={setText}
             />
-            {!isEditing ? (
+            {!isEditing && (
               <input
                 type="file"
                 accept="image/*"
@@ -108,8 +108,6 @@ const Form = (props: Props) => {
                 defaultValue={""}
                 ref={fileInputRef}
               />
-            ) : (
-              ""
             )}
           </div>
           <button className="shadow-md border-2 px-1 py-1 rounded-lg bg-blue-200 max-w-[80px]">
